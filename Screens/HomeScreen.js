@@ -61,7 +61,7 @@ const HomeScreen = () => {
         <Text style={{position:'absolute',top:100,color:'white',fontSize:25,fontWeight:'bold'}}>Make your Journey Simple!</Text>
 
         <Animated.View entering={FadeInUp.delay(200).duration(1000).springify()} style={styles.centered}>
-        <Image style={styles.image} source={require("./image/citybus.jpg")} /> 
+        <Image style={styles.image} source={require("./image/citybus.png")} /> 
       </Animated.View>
 
 

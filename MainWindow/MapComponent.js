@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { StyleSheet, View, TouchableOpacity, Text, Dimensions, Animated } from 'react-native';
+import MapView, {  PROVIDER_GOOGLE } from 'react-native-maps';
+import { StyleSheet, View, TouchableOpacity, Text, Dimensions, Animated ,ScrollView} from 'react-native';
 import { Ionicons } from '@expo/vector-icons'
 const { height } = Dimensions.get("window");;
 import { db } from '../config';
@@ -11,14 +11,17 @@ import { styles } from './MapStyles';
 import { MapTypeSelection } from './MapTypeSelection'; 
 import { getDirections } from './directionsService';
 import VerticalStepIndicator from './VerticalStepIndicator'; // Adjust the import path accordingly
+import { Marker } from 'react-native-maps';
+import { Image } from 'react-native';
 
-
+import a from '../Screens/image/busstop.png';
 const StopMarker = ({ coordinate, title, index }) => (
   <Marker
     coordinate={coordinate}
     title={title}
-    pinColor='green'
-  />
+  >
+    <Image source={a} style={{ width: 37, height: 30 }} />
+    </Marker>
 );
 export default function Mappage() {
   const [mapType, setMapType] = useState('standard');
@@ -221,15 +224,15 @@ const BottomSheet = ({ visible, onClose,selectedLatitude, selectedLongitude,stop
   return (
     visible && (
       <SlidingUpPanel
-        ref={(c) => (this._panel = c)}
-        draggableRange={{ top: height + 180 - 64, bottom: 180 }}
-        animatedValue={_draggedValue}
-        snappingPoints={[420]}
-        height={height + 180}
-        friction={0.5}
-        visible={visible}
-        onBottomReached={onClose}
-      >
+      ref={(c) => (this._panel = c)}
+      draggableRange={{ top: height / 1.05, bottom: 180 }}
+      animatedValue={_draggedValue}
+      snappingPoints={[height / 1.5]}
+      height={height}
+      friction={0.5}
+      visible={visible}
+      onBottomReached={onClose}
+    >
         <View style={styles.panel}>
           <Animated.View
             style={[
@@ -256,23 +259,19 @@ const BottomSheet = ({ visible, onClose,selectedLatitude, selectedLongitude,stop
               <Text style={styles.textHeader}>STOP DETAILS</Text>
             </Animated.View>
           </View>
-          <VerticalStepIndicator
-                    initialLatitude={selectedLatitude}
-                    initialLongitude={selectedLongitude}
-                    stops={stopsvalues}
-                    distances={distances}
-                    stopname={names}
-      />
+          <ScrollView style={{ height: height - 180 }}
+          >
+            <VerticalStepIndicator
+                      initialLatitude={selectedLatitude}
+                      initialLongitude={selectedLongitude}
+                      stops={stopsvalues}
+                      distances={distances}
+                      stopname={names}
+            />
+          </ScrollView>
 
           <View style={styles.container}>
-            {/* Add VerticalStepIndicator here */}
-            {stopDistances.map((stop, index) => (
-              <View key={index} style={styles.stepDetail}>
-                <Text>{stop.name}</Text>
-                <Text>Distance: {stop.distance} km</Text>
-                <Text>Duration: {stop.duration}</Text>
-              </View>
-            ))}
+          
           </View>
         </View>
       </SlidingUpPanel>
@@ -293,15 +292,18 @@ const BottomSheet = ({ visible, onClose,selectedLatitude, selectedLongitude,stop
         mapType={mapType}
       >
         {Object.entries(markerLocations).map(([gpsKey, gpsData]) => (
-          <Marker
-            key={gpsKey}
-            coordinate={{
-              latitude: parseFloat(gpsData.latitude),
-              longitude: parseFloat(gpsData.longitude),
-            }}
-            title={gpsKey}
-            onPress={() => handleGPSMarkerPress(gpsKey)}
-          />
+           <Marker
+           key={gpsKey}
+           coordinate={{
+             latitude: parseFloat(gpsData.latitude),
+             longitude: parseFloat(gpsData.longitude),
+           }}
+           title={gpsKey}
+           onPress={() => handleGPSMarkerPress(gpsKey)}
+           
+         >
+           <Image source={require('../Screens/image/bus.png')} style={{ width: 37, height: 30 }} />
+          </Marker>
         ))}
         {selectedGPS &&
           markerLocations[selectedGPS] &&
@@ -314,7 +316,10 @@ const BottomSheet = ({ visible, onClose,selectedLatitude, selectedLongitude,stop
                 longitude: parseFloat(stop.lon),
               }}
               title={`Stop ${index + 1}`}
-            />
+              
+            >
+              
+              </StopMarker>
           ))}
         {selectedGPS && markerLocations[selectedGPS] && showRoute && (
           <MapViewDirections
@@ -352,9 +357,10 @@ const BottomSheet = ({ visible, onClose,selectedLatitude, selectedLongitude,stop
        names={stopNames}
       />
       )}
-      
-      <MapTypeSelection mapType={mapType} changeMapType={changeMapType} />
-      
+      <View>
+        <MapTypeSelection mapType={mapType} changeMapType={changeMapType} style={styles.mapTypeSelection} />
+      </View>
     </View>
   );
 }
+

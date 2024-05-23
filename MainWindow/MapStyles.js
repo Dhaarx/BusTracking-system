@@ -20,6 +20,7 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
     elevation: 4,
+  
   },
   panel: {
     flex: 1,
@@ -43,8 +44,14 @@ export const styles = StyleSheet.create({
   
   closeButton: {
     position: 'absolute',
-    top: 16,
+    top: 32,
     right: 16,
     zIndex: 2,
   },
+  mapTypeSelection: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 20, // Ensure this is above the map but below the BottomSheet
+  }
 });

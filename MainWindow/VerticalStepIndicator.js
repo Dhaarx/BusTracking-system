@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import StepIndicator from 'react-native-step-indicator';
-import { View, StyleSheet, TouchableOpacity, Text, ScrollView } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 
-const VerticalStepIndicator = ({ initialLatitude, initialLongitude, stops, distances,stopname }) => {
+const VerticalStepIndicator = ({ initialLatitude, initialLongitude, stops, distances, stopname }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isStepIndicatorOpen, setIsStepIndicatorOpen] = useState(true);
   const [latitude, setLatitude] = useState(initialLatitude);
   const [longitude, setLongitude] = useState(initialLongitude);
-  const visitedStopsRef = useRef(new Set()); // Using a Set to keep track of visited stops
+  const visitedStopsRef = useRef(new Set());
 
   const handleGpsMarkerMove = () => {
     let minDistance = Infinity;
@@ -19,15 +19,15 @@ const VerticalStepIndicator = ({ initialLatitude, initialLongitude, stops, dista
         const lon1 = longitude;
         const lat2 = stop.latitude;
         const lon2 = stop.longitude;
-        const R = 6371; // Radius of the Earth in kilometers
-        const dLat = (lat2 - lat1) * Math.PI / 180; // Convert degrees to radians
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
         const a =
           Math.sin(dLat / 2) * Math.sin(dLat / 2) +
           Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
           Math.sin(dLon / 2) * Math.sin(dLon / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        const distance = R * c; // Distance in kilometers
+        const distance = R * c;
 
         if (distance < minDistance) {
           minDistance = distance;
@@ -37,74 +37,75 @@ const VerticalStepIndicator = ({ initialLatitude, initialLongitude, stops, dista
     });
 
     if (closestStopIndex !== currentStep) {
-      visitedStopsRef.current.add(currentStep); // Mark the current stop as visited
+      visitedStopsRef.current.add(currentStep);
       setCurrentStep(closestStopIndex);
     }
   };
-  
+
   useEffect(() => {
-    // Update GPS marker position when latitude or longitude changes
     handleGpsMarkerMove();
-  }, [latitude, longitude, stops]); // Re-run effect when latitude or longitude changes
+  }, [latitude, longitude, stops]);
 
   const toggleStepIndicator = () => {
     setIsStepIndicatorOpen(!isStepIndicatorOpen);
   };
 
-  // Modify the labels array to include the stop labels and distances
-// Modify the labels array to include the stop labels and distances
-const modifiedLabels = distances.map((distance, index) => {
-  const stopLabel = distance.name;
-  const stopName = stopname[index]; // Fetch stop name from the provided array
-  const distanceValue = parseInt(distance.distance); // Convert distance to integer
-  return `${stopName}\n${distanceValue} km`; // Display stop name followed by distance
-});
+  const modifiedLabels = distances.map((distance, index) => {
+    const stopName = stopname[index];
+    const distanceValue = parseInt(distance.distance);
+    const durationValue = distance.duration;
+    return `${stopName}\n${distanceValue} km`; // Display stop name followed by distance
+  });
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Open/Close Buttons */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={toggleStepIndicator} style={styles.button}>
-          <Text>{isStepIndicatorOpen ? 'Close' : 'Open'} Step Indicator</Text>
-        </TouchableOpacity>
-      </View>
       
-      {/* Step Indicator */}
+
       {isStepIndicatorOpen && (
-        <StepIndicator
-          customStyles={{
-            stepIndicatorSize: 25,
-            currentStepIndicatorSize: 30,
-            separatorStrokeWidth: 2,
-            currentStepStrokeWidth: 3,
-            stepStrokeCurrentColor: 'green',
-            stepStrokeWidth: 3,
-            stepStrokeFinishedColor: 'green',
-            stepStrokeUnFinishedColor: 'red',
-            separatorFinishedColor: 'green',
-            separatorUnFinishedColor: 'red',
-            stepIndicatorFinishedColor: 'green',
-            stepIndicatorUnFinishedColor: 'red',
-            stepIndicatorCurrentColor: 'green',
-            stepIndicatorLabelFontSize: 13,
-            currentStepIndicatorLabelFontSize: 13,
-            stepIndicatorLabelCurrentColor: 'green',
-            stepIndicatorLabelFinishedColor: 'green',
-            stepIndicatorLabelUnFinishedColor: 'red',
-            labelColor: 'black',
-            labelSize: 13,
-            currentStepLabelColor: 'blue',
-          }}
-          currentPosition={currentStep}
-          labels={modifiedLabels}
-          stepCount={stops.length}
-          direction="vertical"
-        />
+        <View style={styles.stepContainer}>
+          <StepIndicator
+            customStyles={{
+              stepIndicatorSize: 30,
+              currentStepIndicatorSize: 30,
+              separatorStrokeWidth: 2,
+              currentStepStrokeWidth: 3,
+              stepStrokeCurrentColor: 'green',
+              stepStrokeWidth: 3,
+              stepStrokeFinishedColor: 'green',
+              stepStrokeUnFinishedColor: 'red',
+              separatorFinishedColor: 'green',
+              separatorUnFinishedColor: 'red',
+              stepIndicatorFinishedColor: 'green',
+              stepIndicatorUnFinishedColor: 'red',
+              stepIndicatorCurrentColor: 'green',
+              stepIndicatorLabelFontSize: 13,
+              currentStepIndicatorLabelFontSize: 13,
+              stepIndicatorLabelCurrentColor: 'green',
+              stepIndicatorLabelFinishedColor: 'green',
+              stepIndicatorLabelUnFinishedColor: 'red',
+              labelColor: 'black',
+              labelSize: 13,
+              currentStepLabelColor: 'blue',
+              height: 800, // Increase the height here
+            }}
+            currentPosition={currentStep}
+            labels={modifiedLabels}
+            stepCount={stops.length}
+            direction="vertical"
+          />
+          <View >
+            <Text style={styles.durationTitle}>Duration</Text>
+            {distances.map((distance, index) => (
+              <Text key={index} style={styles.durationText}>
+                {distance.duration}
+              </Text>
+            ))}
+          </View>
+        </View>
       )}
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   buttonContainer: {
@@ -116,6 +117,28 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: 'lightblue',
     borderRadius: 5,
+  },
+  stepContainer: {
+    flexDirection: 'row',
+  },
+  stepIndicatorContainer: {
+    marginRight: 100, // Add margin to the right to move the step indicator slightly right
+  },
+  durationContainer: {
+    marginLeft: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  durationTitle: {
+    fontWeight: 'bold',
+    marginBottom: 55,
+    textAlign: 'center',
+  },
+  durationText: {
+    textAlign: 'center',
+    borderWidth: 30,
+    borderColor: 'white',
+    marginBottom: 15,
   },
 });
 

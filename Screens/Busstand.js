@@ -92,7 +92,7 @@ const ListItem = ({ item }) => {
     const navigation =useNavigation();
 
     const handlePress= async(title,subtitle)=>{
-        console.log(`clicked on ${title} (${subtitle})`);
+        // console.log(`clicked on ${title} (${subtitle})`);
         try {
           const querySnapshot = await getDocs(collection(dbfirestore, title));
           if (querySnapshot.empty) {
